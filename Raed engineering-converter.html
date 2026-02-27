@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>محوّل الوحدات الهندسية الشامل</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c18;
+    --surface: #0f1623;
+    --surface2: #161f30;
+    --surface3: #1c2840;
+    --border: #1e2d45;
+    --border2: #243450;
+    --accent-civil:  #00d4aa;
+    --accent-elec:   #f5c518;
+    --accent-mech:   #ff6b35;
+    --accent-general:#0099ff;
+    --accent: #00d4aa;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family:'Cairo',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 70% 50% at 15% 5%,  rgba(0,153,255,0.07) 0%,transparent 60%),
+      radial-gradient(ellipse 50% 50% at 85% 85%, rgba(0,212,170,0.05) 0%,transparent 60%),
+      repeating-linear-gradient(0deg,   transparent,transparent 70px,rgba(255,255,255,0.008) 70px,rgba(255,255,255,0.008) 71px),
+      repeating-linear-gradient(90deg,  transparent,transparent 70px,rgba(255,255,255,0.008) 70px,rgba(255,255,255,0.008) 71px);
+    pointer-events:none; z-index:0;
+  }
+
+  .wrap { position:relative; z-index:1; max-width:1160px; margin:0 auto; padding:0 18px 60px; }
+
+  /* ── HEADER ── */
+  header { padding:36px 0 24px; text-align:center; }
+  .logo-ring {
+    width:56px; height:56px; border-radius:16px; margin:0 auto 14px;
+    background:linear-gradient(135deg,#00d4aa,#0099ff);
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px;
+    box-shadow:0 0 36px rgba(0,212,170,0.35);
+  }
+  h1 {
+    font-size:clamp(20px,4vw,34px); font-weight:900; letter-spacing:-0.5px;
+    background:linear-gradient(135deg,#00d4aa,#0099ff);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+  .subtitle { color:var(--text-muted); font-size:13px; margin-top:5px; }
+
+  /* ── DISCIPLINE TABS ── */
+  .disc-bar {
+    display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+    margin:26px 0 0;
+  }
+  .disc-btn {
+    display:flex; align-items:center; gap:9px;
+    padding:11px 22px; border-radius:12px;
+    border:2px solid var(--border2);
+    background:var(--surface2);
+    color:var(--text-dim);
+    cursor:pointer; font-family:'Cairo',sans-serif;
+    font-size:14px; font-weight:700;
+    transition:all .22s;
+  }
+  .disc-btn .disc-dot {
+    width:8px; height:8px; border-radius:50%;
+    background:currentColor; opacity:.5;
+    transition:opacity .2s;
+  }
+  .disc-btn:hover { color:var(--text); border-color:var(--border2); }
+  .disc-btn.active-civil  { color:var(--accent-civil);  border-color:var(--accent-civil);  background:rgba(0,212,170,.08);  box-shadow:0 0 18px rgba(0,212,170,.15); }
+  .disc-btn.active-elec   { color:var(--accent-elec);   border-color:var(--accent-elec);   background:rgba(245,197,24,.07); box-shadow:0 0 18px rgba(245,197,24,.15); }
+  .disc-btn.active-mech   { color:var(--accent-mech);   border-color:var(--accent-mech);   background:rgba(255,107,53,.07); box-shadow:0 0 18px rgba(255,107,53,.15); }
+  .disc-btn.active-general{ color:var(--accent-general);border-color:var(--accent-general);background:rgba(0,153,255,.08);  box-shadow:0 0 18px rgba(0,153,255,.15); }
+  .disc-btn.active-civil .disc-dot,
+  .disc-btn.active-elec .disc-dot,
+  .disc-btn.active-mech .disc-dot,
+  .disc-btn.active-general .disc-dot { opacity:1; }
+
+  /* ── CATEGORY PILLS ── */
+  .cat-bar {
+    display:flex; gap:7px; flex-wrap:wrap;
+    margin:18px 0 22px;
+    padding:16px 18px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+  }
+  .cat-btn {
+    padding:7px 15px; border-radius:50px;
+    border:1px solid var(--border2);
+    background:transparent;
+    color:var(--text-muted);
+    cursor:pointer; font-family:'Cairo',sans-serif;
+    font-size:12px; font-weight:600;
+    transition:all .18s;
+    display:flex; align-items:center; gap:6px;
+  }
+  .cat-btn:hover { color:var(--text); border-color:var(--text-muted); }
+  .cat-btn.active {
+    color:#fff;
+    border-color:var(--accent);
+    background:var(--accent);
+  }
+
+  /* ── CONVERTER CARD ── */
+  .conv-card {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 10px 50px rgba(0,0,0,.45);
+  }
+  .conv-head {
+    padding:20px 26px;
+    background:var(--surface2);
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:14px;
+  }
+  .conv-head-icon {
+    width:46px; height:46px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px;
+    border:1px solid var(--accent);
+    background:rgba(0,212,170,.08);
+    flex-shrink:0;
+  }
+  .conv-head-title { font-size:17px; font-weight:800; }
+  .conv-head-desc  { font-size:12px; color:var(--text-muted); margin-top:2px; }
+
+  .conv-body { padding:26px; }
+
+  /* two-column input grid */
+  .input-grid {
+    display:grid;
+    grid-template-columns:1fr 52px 1fr;
+    gap:14px; align-items:end;
+    margin-bottom:22px;
+  }
+  .field-lbl {
+    font-size:11px; font-weight:700; color:var(--text-muted);
+    text-transform:uppercase; letter-spacing:.6px; margin-bottom:7px;
+  }
+  .sel {
+    width:100%; padding:11px 14px;
+    background:var(--bg); border:1px solid var(--border2);
+    border-radius:9px; color:var(--text);
+    font-family:'Cairo',sans-serif; font-size:13px;
+    outline:none; cursor:pointer; transition:border-color .2s;
+    appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:left 11px center;
+    margin-bottom:9px;
+  }
+  .sel:focus { border-color:var(--accent); }
+  .inp {
+    width:100%; padding:13px 15px;
+    background:var(--bg); border:2px solid var(--border2);
+    border-radius:9px; color:var(--text);
+    font-family:'JetBrains Mono',monospace;
+    font-size:17px; font-weight:600;
+    outline:none; transition:border-color .2s, box-shadow .2s;
+    direction:ltr; text-align:left;
+  }
+  .inp:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,212,170,.1); }
+  .inp-result {
+    background:rgba(0,212,170,.04);
+    border-color:rgba(0,212,170,.3);
+    color:var(--accent); cursor:default;
+  }
+  .swap-btn {
+    width:44px; height:44px; border-radius:50%;
+    border:1px solid var(--border2); background:var(--surface2);
+    color:var(--text-dim); cursor:pointer; font-size:17px;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .22s; margin-bottom:2px;
+  }
+  .swap-btn:hover { border-color:var(--accent); color:var(--accent); transform:rotate(180deg); }
+
+  /* result row */
+  .result-row { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; }
+  .big-res {
+    font-family:'JetBrains Mono',monospace;
+    font-size:clamp(22px,4vw,32px); font-weight:700;
+    color:var(--accent); direction:ltr; word-break:break-all;
+  }
+  .copy-btn {
+    padding:7px 14px; border-radius:8px;
+    border:1px solid var(--border2); background:transparent;
+    color:var(--text-muted); font-family:'Cairo',sans-serif;
+    font-size:12px; cursor:pointer; transition:all .18s;
+    display:flex; align-items:center; gap:6px; white-space:nowrap;
+  }
+  .copy-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+  /* formula bar */
+  .fml-bar {
+    background:var(--bg); border:1px solid var(--border);
+    border-radius:9px; padding:13px 16px;
+    display:flex; align-items:center; gap:10px; margin-top:16px;
+  }
+  .fml-lbl { font-size:11px; color:var(--text-muted); font-weight:700; white-space:nowrap; text-transform:uppercase; letter-spacing:.5px; }
+  .fml-txt { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--accent-general); flex:1; direction:ltr; text-align:left; word-break:break-all; }
+
+  /* quick refs */
+  .sec-title {
+    font-size:11px; font-weight:700; color:var(--text-muted);
+    text-transform:uppercase; letter-spacing:1px;
+    margin:22px 0 10px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .sec-title::after { content:''; flex:1; height:1px; background:var(--border); }
+  .ref-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:9px; }
+  .ref-card {
+    background:var(--bg); border:1px solid var(--border);
+    border-radius:9px; padding:11px 14px; cursor:pointer; transition:all .18s;
+  }
+  .ref-card:hover { border-color:var(--accent); background:rgba(0,212,170,.05); }
+  .ref-from { font-size:11px; color:var(--text-muted); margin-bottom:2px; }
+  .ref-val  { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; color:var(--accent); direction:ltr; text-align:left; }
+
+  /* ── TOAST ── */
+  .toast {
+    position:fixed; bottom:28px; left:50%;
+    transform:translateX(-50%) translateY(80px);
+    background:var(--accent); color:#000;
+    padding:11px 24px; border-radius:50px;
+    font-weight:800; font-size:13px; z-index:999;
+    transition:transform .28s;
+  }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+
+  /* footer */
+  footer {
+    text-align:center; margin-top:44px;
+    padding-top:26px; border-top:1px solid var(--border);
+  }
+  .footer-name { font-size:15px; font-weight:800; color:var(--text); }
+  .footer-meta {
+    margin-top:6px; font-family:'JetBrains Mono',monospace;
+    font-size:12px; color:var(--text-muted);
+    display:flex; align-items:center; justify-content:center; gap:14px; direction:ltr;
+  }
+  .footer-ver { color:var(--accent); font-weight:700; }
+
+  @media(max-width:600px){
+    .input-grid { grid-template-columns:1fr; }
+    .swap-btn { margin:0 auto; transform:rotate(90deg); }
+    .swap-btn:hover { transform:rotate(270deg); }
+    .disc-btn { padding:9px 14px; font-size:13px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo-ring">⚙️</div>
+    <h1>محوّل الوحدات الهندسية الشامل</h1>
+    <p class="subtitle">إنشائي • كهربائي • ميكانيكي • عام</p>
+  </header>
+
+  <!-- Discipline selector -->
+  <div class="disc-bar" id="discBar"></div>
+
+  <!-- Category pills -->
+  <div class="cat-bar" id="catBar"></div>
+
+  <!-- Converter -->
+  <div class="conv-card">
+    <div class="conv-head">
+      <div class="conv-head-icon" id="catIcon">📏</div>
+      <div>
+        <div class="conv-head-title" id="catTitle">الطول</div>
+        <div class="conv-head-desc"  id="catDesc">تحويل وحدات الطول والمسافة</div>
+      </div>
+    </div>
+    <div class="conv-body">
+
+      <div class="input-grid">
+        <div>
+          <div class="field-lbl">من وحدة</div>
+          <select class="sel" id="fromUnit"></select>
+          <input class="inp" type="number" id="fromVal" value="1" step="any" placeholder="0">
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding-bottom:3px;">
+          <div style="flex:1;width:1px;background:var(--border);"></div>
+          <button class="swap-btn" id="swapBtn">⇄</button>
+          <div style="flex:1;width:1px;background:var(--border);"></div>
+        </div>
+        <div>
+          <div class="field-lbl">إلى وحدة</div>
+          <select class="sel" id="toUnit"></select>
+          <input class="inp inp-result" type="text" id="toVal" readonly>
+        </div>
+      </div>
+
+      <div class="result-row">
+        <div>
+          <div class="field-lbl">النتيجة</div>
+          <div class="big-res" id="bigResult">—</div>
+        </div>
+        <button class="copy-btn" id="copyBtn">⎘ نسخ</button>
+      </div>
+
+      <div class="fml-bar">
+        <div class="fml-lbl">المعادلة</div>
+        <div class="fml-txt" id="formulaText">—</div>
+      </div>
+
+      <div class="sec-title">مراجع سريعة</div>
+      <div class="ref-grid" id="refGrid"></div>
+
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-name">م. رائد الجراف</div>
+    <div class="footer-meta">
+      <span id="footerDate"></span>
+      <span style="color:var(--border)">|</span>
+      <span class="footer-ver">v2.0.0</span>
+    </div>
+  </footer>
+
+</div>
+<div class="toast" id="toast">تم النسخ ✓</div>
+
+<script>
+/* ================================================================
+   DATA
+   ================================================================ */
+const disciplines = [
+  { id:'general', label:'العام',                       icon:'🔬',  color:'var(--accent-general)', cls:'active-general' },
+  { id:'civil',   label:'الوحدات الإنشائية والمدنية', icon:'🏗️',  color:'var(--accent-civil)',   cls:'active-civil'   },
+  { id:'elec',    label:'الوحدات الكهربائية',          icon:'⚡',  color:'var(--accent-elec)',    cls:'active-elec'    },
+  { id:'mech',    label:'الوحدات الميكانيكية',         icon:'🔩',  color:'var(--accent-mech)',    cls:'active-mech'    },
+];
+
+const allCategories = [
+  /* ===== CIVIL / STRUCTURAL ===== */
+  {
+    id:'length', disc:'civil', icon:'📏', label:'الطول', desc:'وحدات الطول والمسافة',
+    units:[
+      {id:'mm',  name:'ملليمتر (mm)',       f:1e-3},
+      {id:'cm',  name:'سنتيمتر (cm)',       f:1e-2},
+      {id:'dm',  name:'ديسيمتر (dm)',       f:0.1},
+      {id:'m',   name:'متر (m)',             f:1},
+      {id:'km',  name:'كيلومتر (km)',       f:1e3},
+      {id:'in',  name:'بوصة (in)',           f:0.0254},
+      {id:'ft',  name:'قدم (ft)',            f:0.3048},
+      {id:'yd',  name:'ياردة (yd)',          f:0.9144},
+      {id:'mi',  name:'ميل (mi)',            f:1609.344},
+      {id:'nmi', name:'ميل بحري (nmi)',      f:1852},
+    ],
+    refs:[
+      {l:'1 ft',   v:'= 0.3048 m'},
+      {l:'1 in',   v:'= 25.4 mm'},
+      {l:'1 yd',   v:'= 0.9144 m'},
+      {l:'1 mi',   v:'= 1.609 km'},
+    ]
+  },
+  {
+    id:'area', disc:'civil', icon:'⬜', label:'المساحة', desc:'وحدات المساحة والسطح',
+    units:[
+      {id:'mm2', name:'مم² (mm²)',           f:1e-6},
+      {id:'cm2', name:'سم² (cm²)',           f:1e-4},
+      {id:'m2',  name:'م² (m²)',             f:1},
+      {id:'km2', name:'كم² (km²)',           f:1e6},
+      {id:'ha',  name:'هكتار (ha)',          f:1e4},
+      {id:'in2', name:'بوصة² (in²)',        f:6.4516e-4},
+      {id:'ft2', name:'قدم² (ft²)',          f:0.092903},
+      {id:'yd2', name:'ياردة² (yd²)',       f:0.836127},
+      {id:'ac',  name:'فدان (acre)',         f:4046.86},
+    ],
+    refs:[
+      {l:'1 ft²',  v:'= 0.0929 m²'},
+      {l:'1 m²',   v:'= 10.764 ft²'},
+      {l:'1 ha',   v:'= 10,000 m²'},
+      {l:'1 acre', v:'= 4046.9 m²'},
+    ]
+  },
+  {
+    id:'volume', disc:'civil', icon:'📦', label:'الحجم', desc:'وحدات الحجم والسعة',
+    units:[
+      {id:'mm3',  name:'مم³ (mm³)',           f:1e-9},
+      {id:'cm3',  name:'سم³ (cm³)',           f:1e-6},
+      {id:'m3',   name:'م³ (m³)',             f:1},
+      {id:'L',    name:'لتر (L)',             f:1e-3},
+      {id:'mL',   name:'ملليلتر (mL)',       f:1e-6},
+      {id:'ft3',  name:'قدم³ (ft³)',          f:0.0283168},
+      {id:'in3',  name:'بوصة³ (in³)',        f:1.6387e-5},
+      {id:'gal',  name:'جالون أمريكي (gal)', f:0.00378541},
+      {id:'yd3',  name:'ياردة³ (yd³)',       f:0.764555},
+    ],
+    refs:[
+      {l:'1 m³',  v:'= 1000 L'},
+      {l:'1 ft³', v:'= 0.02832 m³'},
+      {l:'1 yd³', v:'= 0.7646 m³'},
+      {l:'1 gal', v:'= 3.785 L'},
+    ]
+  },
+  {
+    id:'force', disc:'civil', icon:'💪', label:'القوة', desc:'القوى والأحمال الهندسية',
+    units:[
+      {id:'N',    name:'نيوتن (N)',               f:1},
+      {id:'kN',   name:'كيلونيوتن (kN)',         f:1e3},
+      {id:'MN',   name:'ميجانيوتن (MN)',         f:1e6},
+      {id:'kgf',  name:'كجم قوة (kgf)',          f:9.80665},
+      {id:'tf',   name:'طن قوة (tf)',            f:9806.65},
+      {id:'lbf',  name:'رطل قوة (lbf)',          f:4.44822},
+      {id:'kipf', name:'كيب (kip)',              f:4448.22},
+    ],
+    refs:[
+      {l:'1 kN',  v:'= 101.97 kgf'},
+      {l:'1 tf',  v:'= 9.807 kN'},
+      {l:'1 kip', v:'= 4.448 kN'},
+      {l:'1 lbf', v:'= 4.448 N'},
+    ]
+  },
+  {
+    id:'pressure', disc:'civil', icon:'🔴', label:'الضغط / الإجهاد', desc:'وحدات الضغط والإجهاد',
+    units:[
+      {id:'Pa',    name:'باسكال (Pa)',             f:1},
+      {id:'kPa',   name:'كيلوباسكال (kPa)',       f:1e3},
+      {id:'MPa',   name:'ميجاباسكال (MPa)',       f:1e6},
+      {id:'GPa',   name:'جيجاباسكال (GPa)',       f:1e9},
+      {id:'bar',   name:'بار (bar)',               f:1e5},
+      {id:'atm',   name:'ضغط جوي (atm)',          f:101325},
+      {id:'psi',   name:'PSI (psi)',               f:6894.76},
+      {id:'ksi',   name:'KSI (ksi)',               f:6894760},
+      {id:'kgcm2', name:'كجم/سم² (kgf/cm²)',     f:98066.5},
+      {id:'tf_m2', name:'طن/م² (tf/m²)',          f:9806.65},
+    ],
+    refs:[
+      {l:'1 MPa',      v:'= 1 N/mm²'},
+      {l:'1 kgf/cm²',  v:'= 98.07 kPa'},
+      {l:'1 psi',      v:'= 6.895 kPa'},
+      {l:'1 bar',      v:'= 0.1 MPa'},
+    ]
+  },
+  {
+    id:'moment', disc:'civil', icon:'🔧', label:'العزوم', desc:'عزوم الانعطاف والانعزام',
+    units:[
+      {id:'Nm',    name:'نيوتن·م (N·m)',         f:1},
+      {id:'kNm',   name:'كيلونيوتن·م (kN·m)',   f:1e3},
+      {id:'MNm',   name:'ميجانيوتن·م (MN·m)',   f:1e6},
+      {id:'kgfm',  name:'كجم·م (kgf·m)',        f:9.80665},
+      {id:'tfm',   name:'طن·م (tf·m)',           f:9806.65},
+      {id:'lbft',  name:'رطل·قدم (lbf·ft)',     f:1.35582},
+      {id:'lbin',  name:'رطل·بوصة (lbf·in)',    f:0.112985},
+      {id:'kipft', name:'كيب·قدم (kip·ft)',      f:1355.82},
+    ],
+    refs:[
+      {l:'1 kN·m',   v:'= 101.97 kgf·m'},
+      {l:'1 tf·m',   v:'= 9.807 kN·m'},
+      {l:'1 kip·ft', v:'= 1.356 kN·m'},
+      {l:'1 lbf·ft', v:'= 1.356 N·m'},
+    ]
+  },
+  {
+    id:'mass', disc:'civil', icon:'⚖️', label:'الكتلة', desc:'وحدات الكتلة والوزن',
+    units:[
+      {id:'mg',     name:'ملليجرام (mg)',         f:1e-6},
+      {id:'g',      name:'جرام (g)',              f:1e-3},
+      {id:'kg',     name:'كيلوجرام (kg)',         f:1},
+      {id:'t',      name:'طن متري (t)',           f:1e3},
+      {id:'lb',     name:'رطل (lb)',              f:0.453592},
+      {id:'oz',     name:'أوقية (oz)',            f:0.0283495},
+      {id:'ton_us', name:'طن أمريكي (US ton)',    f:907.185},
+      {id:'ton_uk', name:'طن بريطاني (UK ton)',   f:1016.05},
+    ],
+    refs:[
+      {l:'1 t',       v:'= 1000 kg'},
+      {l:'1 kg',      v:'= 2.2046 lb'},
+      {l:'1 US ton',  v:'= 907.2 kg'},
+      {l:'1 UK ton',  v:'= 1016 kg'},
+    ]
+  },
+  {
+    id:'flow', disc:'civil', icon:'💧', label:'التصرف', desc:'تصرف المياه والسوائل',
+    units:[
+      {id:'m3s',   name:'م³/ث (m³/s)',         f:1},
+      {id:'m3h',   name:'م³/ساعة (m³/h)',      f:1/3600},
+      {id:'m3d',   name:'م³/يوم (m³/day)',     f:1/86400},
+      {id:'Ls',    name:'لتر/ث (L/s)',         f:1e-3},
+      {id:'Lmin',  name:'لتر/دقيقة (L/min)',  f:1/60000},
+      {id:'gpm',   name:'جالون/دقيقة (GPM)',  f:6.309e-5},
+      {id:'cfs',   name:'قدم³/ث (cfs)',       f:0.0283168},
+      {id:'MGD',   name:'مليون جالون/يوم (MGD)',f:0.04381},
+    ],
+    refs:[
+      {l:'1 m³/s',    v:'= 1000 L/s'},
+      {l:'1 L/s',     v:'= 0.001 m³/s'},
+      {l:'1 m³/h',    v:'= 0.2778 L/s'},
+      {l:'1 GPM',     v:'= 0.0631 L/s'},
+    ]
+  },
+  {
+    id:'angle', disc:'civil', icon:'📐', label:'الزوايا والميل', desc:'الزوايا وانحدار الأرض',
+    units:[
+      {id:'deg',    name:'درجة (°)',           f:1},
+      {id:'rad',    name:'راديان (rad)',       f:180/Math.PI},
+      {id:'grad',   name:'غراد (grad)',        f:0.9},
+      {id:'pct',    name:'ميل مئوي (%)',      f:null,pctMode:true},
+      {id:'ratio1', name:'نسبة 1:x',          f:null,ratioMode:true},
+    ],
+    angleMode:true,
+    refs:[
+      {l:'1°',   v:'= 0.01745 rad'},
+      {l:'45°',  v:'= 100% slope'},
+      {l:'1%',   v:'= 0.573°'},
+      {l:'1:100',v:'= 1% slope'},
+    ]
+  },
+
+  /* ===== ELECTRICAL ===== */
+  {
+    id:'voltage', disc:'elec', icon:'⚡', label:'الجهد الكهربائي', desc:'جهد فولت وتحويلاته',
+    units:[
+      {id:'uV',  name:'ميكروفولت (µV)',    f:1e-6},
+      {id:'mV',  name:'ملليفولت (mV)',     f:1e-3},
+      {id:'V',   name:'فولت (V)',          f:1},
+      {id:'kV',  name:'كيلوفولت (kV)',    f:1e3},
+      {id:'MV',  name:'ميجافولت (MV)',    f:1e6},
+    ],
+    refs:[
+      {l:'1 kV',  v:'= 1000 V'},
+      {l:'1 mV',  v:'= 0.001 V'},
+      {l:'230 V', v:'= 0.23 kV (شبكة منزلية)'},
+      {l:'400 kV',v:'= خط نقل عالي الجهد'},
+    ]
+  },
+  {
+    id:'current', disc:'elec', icon:'🌊', label:'التيار الكهربائي', desc:'وحدات التيار الكهربائي',
+    units:[
+      {id:'uA',  name:'ميكروأمبير (µA)',   f:1e-6},
+      {id:'mA',  name:'ملليأمبير (mA)',    f:1e-3},
+      {id:'A',   name:'أمبير (A)',         f:1},
+      {id:'kA',  name:'كيلوأمبير (kA)',   f:1e3},
+    ],
+    refs:[
+      {l:'1 A',    v:'= 1000 mA'},
+      {l:'1 kA',   v:'= 1000 A'},
+      {l:'100 mA', v:'= 0.1 A (خطر الصعق)'},
+      {l:'1 µA',   v:'= 0.000001 A'},
+    ]
+  },
+  {
+    id:'resistance', disc:'elec', icon:'⭕', label:'المقاومة الكهربائية', desc:'أوم وتحويلاته',
+    units:[
+      {id:'uOhm', name:'ميكروأوم (µΩ)',    f:1e-6},
+      {id:'mOhm', name:'ملليأوم (mΩ)',     f:1e-3},
+      {id:'Ohm',  name:'أوم (Ω)',          f:1},
+      {id:'kOhm', name:'كيلوأوم (kΩ)',    f:1e3},
+      {id:'MOhm', name:'ميجاأوم (MΩ)',    f:1e6},
+      {id:'GOhm', name:'جيجاأوم (GΩ)',    f:1e9},
+    ],
+    refs:[
+      {l:'1 kΩ',  v:'= 1000 Ω'},
+      {l:'1 MΩ',  v:'= 1,000,000 Ω'},
+      {l:'V = I×R',v:'قانون أوم الأساسي'},
+      {l:'P = I²R',v:'معادلة القدرة'},
+    ]
+  },
+  {
+    id:'power_elec', disc:'elec', icon:'💡', label:'القدرة الكهربائية', desc:'واط وتحويلاته',
+    units:[
+      {id:'uW',   name:'ميكرواط (µW)',      f:1e-6},
+      {id:'mW',   name:'ملليواط (mW)',      f:1e-3},
+      {id:'W',    name:'واط (W)',            f:1},
+      {id:'kW',   name:'كيلواط (kW)',       f:1e3},
+      {id:'MW',   name:'ميجاواط (MW)',      f:1e6},
+      {id:'GW',   name:'جيجاواط (GW)',      f:1e9},
+      {id:'hp',   name:'حصان ميكانيكي (hp)',f:745.7},
+      {id:'hp_m', name:'حصان متري (PS)',    f:735.499},
+      {id:'BTUh', name:'وحدة حرارية/ساعة (BTU/h)', f:0.293071},
+      {id:'TR',   name:'طن تبريد (TR)',     f:3516.85},
+    ],
+    refs:[
+      {l:'1 kW',  v:'= 1.341 hp'},
+      {l:'1 hp',  v:'= 0.7457 kW'},
+      {l:'1 TR',  v:'= 3.517 kW'},
+      {l:'1 MW',  v:'= 1000 kW'},
+    ]
+  },
+  {
+    id:'energy', disc:'elec', icon:'🔋', label:'الطاقة', desc:'وحدات الطاقة والعمل الكهربائي',
+    units:[
+      {id:'J',    name:'جول (J)',             f:1},
+      {id:'kJ',   name:'كيلوجول (kJ)',       f:1e3},
+      {id:'MJ',   name:'ميجاجول (MJ)',       f:1e6},
+      {id:'GJ',   name:'جيجاجول (GJ)',       f:1e9},
+      {id:'Wh',   name:'واط·ساعة (Wh)',      f:3600},
+      {id:'kWh',  name:'كيلواط·ساعة (kWh)', f:3.6e6},
+      {id:'MWh',  name:'ميجاواط·ساعة (MWh)',f:3.6e9},
+      {id:'BTU',  name:'وحدة حرارية بريطانية (BTU)', f:1055.06},
+      {id:'cal',  name:'سعر حراري (cal)',    f:4.184},
+      {id:'kcal', name:'كيلو سعر (kcal)',    f:4184},
+      {id:'eV',   name:'إلكترون فولت (eV)',  f:1.60218e-19},
+    ],
+    refs:[
+      {l:'1 kWh',  v:'= 3.6 MJ'},
+      {l:'1 BTU',  v:'= 1055 J'},
+      {l:'1 kcal', v:'= 4184 J'},
+      {l:'1 MWh',  v:'= 1000 kWh'},
+    ]
+  },
+  {
+    id:'frequency', disc:'elec', icon:'〰️', label:'التردد', desc:'وحدات التردد والدورات',
+    units:[
+      {id:'Hz',   name:'هرتز (Hz)',           f:1},
+      {id:'kHz',  name:'كيلوهرتز (kHz)',     f:1e3},
+      {id:'MHz',  name:'ميجاهرتز (MHz)',     f:1e6},
+      {id:'GHz',  name:'جيجاهرتز (GHz)',     f:1e9},
+      {id:'rpm',  name:'دورة/دقيقة (rpm)',   f:1/60},
+      {id:'rps',  name:'دورة/ثانية (rps)',   f:1},
+      {id:'rad_s',name:'راديان/ثانية (rad/s)',f:1/(2*Math.PI)},
+    ],
+    refs:[
+      {l:'50 Hz',  v:'تردد الشبكة (خليج/أوروبا)'},
+      {l:'60 Hz',  v:'تردد الشبكة (أمريكا)'},
+      {l:'1 kHz',  v:'= 1000 Hz'},
+      {l:'1 rpm',  v:'= 0.01667 Hz'},
+    ]
+  },
+  {
+    id:'capacitance', disc:'elec', icon:'🔌', label:'السعة والحث', desc:'فاراد، هنري وتحويلاتهما',
+    units:[
+      {id:'pF',  name:'بيكوفاراد (pF)',   f:1e-12},
+      {id:'nF',  name:'نانوفاراد (nF)',   f:1e-9},
+      {id:'uF',  name:'ميكروفاراد (µF)', f:1e-6},
+      {id:'mF',  name:'ملليفاراد (mF)',  f:1e-3},
+      {id:'F',   name:'فاراد (F)',        f:1},
+    ],
+    refs:[
+      {l:'1 µF',  v:'= 1000 nF'},
+      {l:'1 nF',  v:'= 1000 pF'},
+      {l:'1 mF',  v:'= 1000 µF'},
+      {l:'X_C=1/(2πfC)',v:'مقاومة المكثف'},
+    ]
+  },
+  {
+    id:'illuminance', disc:'elec', icon:'💡', label:'الإضاءة', desc:'وحدات شدة الإضاءة',
+    units:[
+      {id:'lux',  name:'لكس (lux)',                f:1},
+      {id:'fc',   name:'قدم·شمعة (foot-candle)',  f:10.7639},
+      {id:'lm_m2',name:'لومن/م² (lm/m²)',        f:1},
+      {id:'ph',   name:'فوط (phot)',               f:10000},
+    ],
+    refs:[
+      {l:'1 fc',    v:'= 10.76 lux'},
+      {l:'500 lux', v:'إضاءة مكتب مناسبة'},
+      {l:'100 lux', v:'إضاءة ممرات'},
+      {l:'750 lux', v:'إضاءة ورشة عمل'},
+    ]
+  },
+
+  /* ===== MECHANICAL ===== */
+  {
+    id:'torque', disc:'mech', icon:'🔩', label:'عزم الدوران', desc:'وحدات عزم الدوران والانعزام',
+    units:[
+      {id:'Nm_t',    name:'نيوتن·م (N·m)',         f:1},
+      {id:'kNm_t',   name:'كيلونيوتن·م (kN·m)',   f:1e3},
+      {id:'kgfm_t',  name:'كجم·م (kgf·m)',        f:9.80665},
+      {id:'kgfcm_t', name:'كجم·سم (kgf·cm)',      f:0.0980665},
+      {id:'lbft_t',  name:'رطل·قدم (lbf·ft)',     f:1.35582},
+      {id:'lbin_t',  name:'رطل·بوصة (lbf·in)',    f:0.112985},
+      {id:'ozin_t',  name:'أوقية·بوصة (oz·in)',   f:0.00706155},
+      {id:'kipft_t', name:'كيب·قدم (kip·ft)',      f:1355.82},
+    ],
+    refs:[
+      {l:'1 N·m',    v:'= 0.738 lbf·ft'},
+      {l:'1 kgf·m',  v:'= 9.807 N·m'},
+      {l:'1 kip·ft', v:'= 1.356 kN·m'},
+      {l:'1 lbf·ft', v:'= 1.356 N·m'},
+    ]
+  },
+  {
+    id:'power_mech', disc:'mech', icon:'🏎️', label:'القدرة الميكانيكية', desc:'واط وحصان وتحويلاتهما',
+    units:[
+      {id:'W_m',   name:'واط (W)',                f:1},
+      {id:'kW_m',  name:'كيلواط (kW)',            f:1e3},
+      {id:'MW_m',  name:'ميجاواط (MW)',           f:1e6},
+      {id:'hp_m2', name:'حصان ميكانيكي (hp)',     f:745.7},
+      {id:'ps_m',  name:'حصان متري (PS/CV)',      f:735.499},
+      {id:'BTUh_m',name:'BTU/ساعة (BTU/h)',       f:0.293071},
+      {id:'kcals', name:'كيلو سعر/ث (kcal/s)',    f:4184},
+    ],
+    refs:[
+      {l:'1 hp',    v:'= 0.7457 kW'},
+      {l:'1 kW',    v:'= 1.341 hp'},
+      {l:'1 PS',    v:'= 0.7355 kW'},
+      {l:'100 hp',  v:'= 74.57 kW'},
+    ]
+  },
+  {
+    id:'speed_mech', disc:'mech', icon:'💨', label:'السرعة', desc:'وحدات السرعة الخطية',
+    units:[
+      {id:'ms_m',   name:'م/ث (m/s)',             f:1},
+      {id:'kmh_m',  name:'كم/ساعة (km/h)',        f:1/3.6},
+      {id:'mph_m',  name:'ميل/ساعة (mph)',        f:0.44704},
+      {id:'fts_m',  name:'قدم/ثانية (ft/s)',      f:0.3048},
+      {id:'kn_m',   name:'عقدة بحرية (knot)',     f:0.514444},
+      {id:'mach',   name:'ماخ (Mach ≈ 343 m/s)', f:343},
+    ],
+    refs:[
+      {l:'1 m/s',   v:'= 3.6 km/h'},
+      {l:'100 km/h',v:'= 27.78 m/s'},
+      {l:'1 mph',   v:'= 1.609 km/h'},
+      {l:'1 knot',  v:'= 1.852 km/h'},
+    ]
+  },
+  {
+    id:'accel', disc:'mech', icon:'🚀', label:'التسارع', desc:'وحدات التسارع الخطي',
+    units:[
+      {id:'ms2',   name:'م/ث² (m/s²)',           f:1},
+      {id:'cms2',  name:'سم/ث² (cm/s²)',         f:0.01},
+      {id:'fts2',  name:'قدم/ث² (ft/s²)',        f:0.3048},
+      {id:'g0',    name:'جاذبية أرضية (g)',       f:9.80665},
+      {id:'Gal',   name:'غال (Gal)',               f:0.01},
+      {id:'ins2',  name:'بوصة/ث² (in/s²)',       f:0.0254},
+    ],
+    refs:[
+      {l:'1 g',    v:'= 9.807 m/s²'},
+      {l:'9.807 m/s²',v:'= تسارع الجاذبية'},
+      {l:'1 ft/s²',v:'= 0.305 m/s²'},
+      {l:'1 Gal',  v:'= 0.01 m/s²'},
+    ]
+  },
+  {
+    id:'density', disc:'mech', icon:'🧱', label:'الكثافة', desc:'كثافة المواد والسوائل',
+    units:[
+      {id:'kgm3',  name:'كجم/م³ (kg/m³)',        f:1},
+      {id:'gcm3',  name:'جم/سم³ (g/cm³)',        f:1000},
+      {id:'kgL',   name:'كجم/لتر (kg/L)',        f:1000},
+      {id:'lbft3', name:'رطل/قدم³ (lb/ft³)',     f:16.0185},
+      {id:'lbin3', name:'رطل/بوصة³ (lb/in³)',    f:27679.9},
+      {id:'tonne_m3',name:'طن/م³ (t/m³)',       f:1000},
+    ],
+    refs:[
+      {l:'ماء',     v:'= 1000 kg/m³'},
+      {l:'خرسانة',  v:'≈ 2400 kg/m³'},
+      {l:'فولاذ',   v:'≈ 7850 kg/m³'},
+      {l:'ألمنيوم', v:'≈ 2700 kg/m³'},
+    ]
+  },
+  {
+    id:'viscosity', disc:'mech', icon:'💧', label:'اللزوجة', desc:'اللزوجة الديناميكية والحركية',
+    units:[
+      {id:'Pa_s',   name:'باسكال·ث (Pa·s)',       f:1},
+      {id:'mPa_s',  name:'ملليباسكال·ث (mPa·s)', f:1e-3},
+      {id:'cP',     name:'سنتيبواز (cP)',          f:1e-3},
+      {id:'P',      name:'بواز (P)',               f:0.1},
+      {id:'cSt',    name:'سنتيستوك (cSt)',        f:1e-6},
+      {id:'St',     name:'ستوك (St)',              f:1e-4},
+    ],
+    refs:[
+      {l:'ماء عند 20°C', v:'≈ 1 mPa·s = 1 cP'},
+      {l:'زيت محرك',     v:'≈ 100–200 cP'},
+      {l:'عسل',          v:'≈ 2000–10000 cP'},
+      {l:'1 Pa·s',       v:'= 1000 mPa·s'},
+    ]
+  },
+  {
+    id:'heat_transfer', disc:'mech', icon:'🌡️', label:'الحرارة والانتقال', desc:'وحدات حرارية ومعاملات الانتقال',
+    units:[
+      {id:'W_mK',    name:'واط/(م·كلفن) — W/(m·K)',            f:1},
+      {id:'BTU_hftF',name:'BTU/(h·ft·°F)',                     f:1.73073},
+      {id:'kcal_mhC',name:'كيلو سعر/(م·ساعة·°C)',             f:1.163},
+      {id:'W_m2K',   name:'واط/(م²·كلفن) — W/(m²·K)',        f:1},
+      {id:'BTU_hft2F',name:'BTU/(h·ft²·°F)',                  f:5.67826},
+    ],
+    refs:[
+      {l:'خرسانة',  v:'≈ 1.7 W/(m·K)'},
+      {l:'فولاذ',   v:'≈ 50 W/(m·K)'},
+      {l:'عزل حراري',v:'≈ 0.04 W/(m·K)'},
+      {l:'ماء',     v:'≈ 0.6 W/(m·K)'},
+    ]
+  },
+
+  /* ===== GENERAL ===== */
+  {
+    id:'temp', disc:'general', icon:'🌡️', label:'درجة الحرارة', desc:'تحويل درجات الحرارة',
+    units:[
+      {id:'C', name:'درجة مئوية (°C)',   f:1},
+      {id:'F', name:'فهرنهايت (°F)',     f:1},
+      {id:'K', name:'كلفن (K)',           f:1},
+      {id:'R', name:'رانكين (°R)',        f:1},
+    ],
+    tempMode:true,
+    refs:[
+      {l:'0°C',    v:'= 32°F = 273.15 K'},
+      {l:'100°C',  v:'= 212°F = 373.15 K'},
+      {l:'-40°C',  v:'= -40°F'},
+      {l:'20°C',   v:'= 68°F'},
+    ]
+  },
+  {
+    id:'time', disc:'general', icon:'⏱️', label:'الزمن', desc:'وحدات الزمن والمدة',
+    units:[
+      {id:'ns',   name:'نانوثانية (ns)',        f:1e-9},
+      {id:'us',   name:'ميكروثانية (µs)',       f:1e-6},
+      {id:'ms_t', name:'ملليثانية (ms)',        f:1e-3},
+      {id:'s',    name:'ثانية (s)',             f:1},
+      {id:'min',  name:'دقيقة (min)',           f:60},
+      {id:'hr',   name:'ساعة (h)',             f:3600},
+      {id:'day',  name:'يوم (day)',            f:86400},
+      {id:'wk',   name:'أسبوع (week)',         f:604800},
+      {id:'mo',   name:'شهر 30 يوم (month)',   f:2592000},
+      {id:'yr',   name:'سنة 365 يوم (year)',   f:31536000},
+    ],
+    refs:[
+      {l:'1 hr',   v:'= 3600 s'},
+      {l:'1 day',  v:'= 86400 s'},
+      {l:'1 week', v:'= 168 hrs'},
+      {l:'1 year', v:'= 8760 hrs'},
+    ]
+  },
+  {
+    id:'data', disc:'general', icon:'💾', label:'البيانات الرقمية', desc:'وحدات سعة التخزين',
+    units:[
+      {id:'bit',  name:'بت (bit)',        f:1},
+      {id:'Byte', name:'بايت (Byte)',     f:8},
+      {id:'KB',   name:'كيلوبايت (KB)',  f:8192},
+      {id:'MB',   name:'ميجابايت (MB)',  f:8388608},
+      {id:'GB',   name:'جيجابايت (GB)',  f:8589934592},
+      {id:'TB',   name:'تيرابايت (TB)',  f:8.796e12},
+      {id:'PB',   name:'بيتابايت (PB)',  f:9.007e15},
+      {id:'Kib',  name:'كيبيبايت (KiB)',f:8192},
+      {id:'Mib',  name:'ميبيبايت (MiB)',f:8388608},
+    ],
+    refs:[
+      {l:'1 KB',  v:'= 1024 Bytes'},
+      {l:'1 MB',  v:'= 1024 KB'},
+      {l:'1 GB',  v:'= 1024 MB'},
+      {l:'1 TB',  v:'= 1024 GB'},
+    ]
+  },
+  {
+    id:'concentration', disc:'general', icon:'🧪', label:'التركيز', desc:'وحدات التركيز الكيميائي',
+    units:[
+      {id:'kgm3_c', name:'كجم/م³ (kg/m³)',     f:1},
+      {id:'gL',     name:'جم/لتر (g/L)',        f:1},
+      {id:'mgL',    name:'ملليجم/لتر (mg/L)',  f:1e-3},
+      {id:'ugL',    name:'ميكروجم/لتر (µg/L)', f:1e-6},
+      {id:'ppm_m',  name:'جزء/مليون (ppm)',    f:1e-3},
+      {id:'ppb',    name:'جزء/مليار (ppb)',     f:1e-6},
+      {id:'ppt',    name:'جزء/تريليون (ppt)',   f:1e-9},
+    ],
+    refs:[
+      {l:'1 mg/L',   v:'= 1 ppm (تقريباً في الماء)'},
+      {l:'1 g/L',    v:'= 1000 mg/L'},
+      {l:'1 ppm',    v:'= 1000 ppb'},
+      {l:'1000 µg/L',v:'= 1 mg/L'},
+    ]
+  },
+];
+
+/* ================================================================
+   STATE
+   ================================================================ */
+let currentDisc = 'general';
+let currentCat  = allCategories.find(c => c.disc === 'general');
+
+/* ================================================================
+   BUILD UI
+   ================================================================ */
+function buildDiscBar(){
+  const bar = document.getElementById('discBar');
+  bar.innerHTML = '';
+  disciplines.forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'disc-btn' + (d.id===currentDisc ? ' '+d.cls : '');
+    btn.dataset.id  = d.id;
+    btn.dataset.cls = d.cls;
+    btn.innerHTML = `<span class="disc-dot"></span>${d.icon} ${d.label}`;
+    btn.onclick = () => selectDisc(d, btn);
+    bar.appendChild(btn);
+  });
+}
+
+function buildCatBar(){
+  const bar = document.getElementById('catBar');
+  bar.innerHTML = '';
+  const cats = allCategories.filter(c => c.disc === currentDisc);
+  cats.forEach((cat, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (cat.id===currentCat.id ? ' active' : '');
+    btn.innerHTML = `${cat.icon} ${cat.label}`;
+    btn.onclick = () => selectCat(cat, btn);
+    bar.appendChild(btn);
+  });
+}
+
+function selectDisc(d, btn){
+  document.querySelectorAll('.disc-btn').forEach(b => {
+    b.className = 'disc-btn';
+  });
+  btn.className = 'disc-btn ' + d.cls;
+  currentDisc = d.id;
+
+  // pick first cat in discipline
+  const cats = allCategories.filter(c => c.disc === d.id);
+  currentCat  = cats[0];
+
+  // update accent color dynamically
+  const colorMap = {
+    civil:'var(--accent-civil)',
+    elec: 'var(--accent-elec)',
+    mech: 'var(--accent-mech)',
+    general:'var(--accent-general)'
+  };
+  document.documentElement.style.setProperty('--accent', colorMap[d.id] || 'var(--accent-civil)');
+
+  buildCatBar();
+  loadCat(currentCat);
+}
+
+function selectCat(cat, btn){
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentCat = cat;
+  loadCat(cat);
+}
+
+function loadCat(cat){
+  document.getElementById('catIcon').textContent  = cat.icon;
+  document.getElementById('catTitle').textContent = cat.label;
+  document.getElementById('catDesc').textContent  = cat.desc;
+
+  const fromSel = document.getElementById('fromUnit');
+  const toSel   = document.getElementById('toUnit');
+  fromSel.innerHTML = '';
+  toSel.innerHTML   = '';
+  cat.units.forEach((u, i) => {
+    fromSel.appendChild(new Option(u.name, u.id));
+    toSel.appendChild(new Option(u.name, u.id));
+  });
+  if(cat.units.length > 1) toSel.selectedIndex = 1;
+  document.getElementById('fromVal').value = '1';
+  convert();
+  buildRefs(cat);
+}
+
+function buildRefs(cat){
+  const grid = document.getElementById('refGrid');
+  grid.innerHTML = '';
+  if(!cat.refs) return;
+  cat.refs.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'ref-card';
+    card.innerHTML = `<div class="ref-from">${r.l}</div><div class="ref-val">${r.v}</div>`;
+    card.onclick = () => {
+      const m = r.l.match(/^-?([\d.]+)/);
+      if(m){ document.getElementById('fromVal').value = m[1]; convert(); }
+    };
+    grid.appendChild(card);
+  });
+}
+
+/* ================================================================
+   CONVERSION LOGIC
+   ================================================================ */
+function getUnit(id){ return currentCat.units.find(u => u.id === id); }
+
+function convertTemp(val, from, to){
+  let c;
+  if(from==='C') c=val;
+  else if(from==='F') c=(val-32)*5/9;
+  else if(from==='K') c=val-273.15;
+  else if(from==='R') c=(val-491.67)*5/9;
+  if(to==='C') return c;
+  if(to==='F') return c*9/5+32;
+  if(to==='K') return c+273.15;
+  if(to==='R') return (c+273.15)*9/5;
+}
+
+function convertAngle(val, from, to){
+  let deg;
+  if(from==='deg')    deg=val;
+  else if(from==='rad')   deg=val*180/Math.PI;
+  else if(from==='grad')  deg=val*0.9;
+  else if(from==='pct')   deg=Math.atan(val/100)*180/Math.PI;
+  else if(from==='ratio1')deg=Math.atan(1/val)*180/Math.PI;
+  if(to==='deg')    return deg;
+  if(to==='rad')    return deg*Math.PI/180;
+  if(to==='grad')   return deg/0.9;
+  if(to==='pct')    return Math.tan(deg*Math.PI/180)*100;
+  if(to==='ratio1') return 1/Math.tan(deg*Math.PI/180);
+}
+
+function formatNum(n){
+  if(n===null||isNaN(n)||!isFinite(n)) return '—';
+  const a=Math.abs(n);
+  if(a===0) return '0';
+  if(a>=0.0001 && a<1e9){
+    let s=n.toPrecision(8);
+    if(s.includes('.')&&!s.includes('e')) s=s.replace(/\.?0+$/,'');
+    return s;
+  }
+  return n.toExponential(5);
+}
+
+function convert(){
+  const fromId = document.getElementById('fromUnit').value;
+  const toId   = document.getElementById('toUnit').value;
+  const val    = parseFloat(document.getElementById('fromVal').value);
+
+  if(isNaN(val)){
+    ['toVal','bigResult','formulaText'].forEach(id=>{
+      document.getElementById(id)[id==='bigResult'?'textContent':'value'] = '—';
+    });
+    return;
+  }
+
+  let result, formula='';
+
+  if(currentCat.tempMode){
+    result  = convertTemp(val, fromId, toId);
+    formula = `تحويل ${getUnit(fromId).name} → ${getUnit(toId).name}`;
+  } else if(currentCat.angleMode){
+    result  = convertAngle(val, fromId, toId);
+    formula = `${val} [${fromId}] → [${toId}]`;
+  } else {
+    const fU = getUnit(fromId);
+    const tU = getUnit(toId);
+    const base = val * fU.f;
+    result  = base / tU.f;
+    if(fromId===toId) formula=`قيمة متطابقة: ${val}`;
+    else formula=`${val} × ${formatNum(fU.f)} ÷ ${formatNum(tU.f)} = ${formatNum(result)}`;
+  }
+
+  const formatted = formatNum(result);
+  document.getElementById('toVal').value      = formatted;
+  document.getElementById('bigResult').textContent = formatted;
+  document.getElementById('formulaText').textContent = formula;
+}
+
+function swap(){
+  const f=document.getElementById('fromUnit');
+  const t=document.getElementById('toUnit');
+  const fv=f.value; f.value=t.value; t.value=fv;
+  const rv=document.getElementById('toVal').value;
+  if(rv&&rv!=='—') document.getElementById('fromVal').value=rv;
+  convert();
+}
+
+function copyResult(){
+  const v=document.getElementById('bigResult').textContent;
+  if(v&&v!=='—'){
+    navigator.clipboard.writeText(v).catch(()=>{});
+    const t=document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2000);
+  }
+}
+
+/* ================================================================
+   FOOTER DATE
+   ================================================================ */
+const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const now=new Date();
+document.getElementById('footerDate').textContent=`${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+/* ================================================================
+   INIT
+   ================================================================ */
+buildDiscBar();
+buildCatBar();
+// set initial accent color
+document.documentElement.style.setProperty('--accent', 'var(--accent-general)');
+loadCat(currentCat);
+
+document.getElementById('fromVal').addEventListener('input', convert);
+document.getElementById('fromUnit').addEventListener('change', convert);
+document.getElementById('toUnit').addEventListener('change', convert);
+document.getElementById('swapBtn').addEventListener('click', swap);
+document.getElementById('copyBtn').addEventListener('click', copyResult);
+</script>
+</body>
+</html>
